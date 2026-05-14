@@ -5,7 +5,8 @@
 // livesRef: vidas actuales (ref)
 // scoreRef: score actual (ref)
 // effARef: señal EMG A (para animaciones)
-export const drawGame = (ctx, canvas, state, livesRef, scoreRef, effARef,difficultyRef) => {
+export const drawGame = (ctx, canvas, state, livesRef, scoreRef, effARef,difficultyRef, gameOver
+) => {
 
   // 1. Fondo y Suelo
 
@@ -70,6 +71,14 @@ export const drawGame = (ctx, canvas, state, livesRef, scoreRef, effARef,difficu
   // 4. Pollito (player)
 
   // Posición del pollo
+  ctx.save();
+
+if (gameOver) {
+  ctx.translate(state.chickenX + 30, 465);
+  ctx.rotate(Math.PI);
+  ctx.translate(-state.chickenX - 30, -465);
+}
+
   const x = state.chickenX;
   const y = 440;
 
@@ -84,8 +93,17 @@ export const drawGame = (ctx, canvas, state, livesRef, scoreRef, effARef,difficu
   // Ojo
   ctx.fillStyle = 'black';
   ctx.beginPath();
-  ctx.arc(x + 45, y + 15, 3, 0, Math.PI * 2);
+if (gameOver) {
+  ctx.fillStyle = '#111827';
+  ctx.font = 'bold 18px Arial';
+  ctx.textAlign = 'center';
+  ctx.fillText('X', state.chickenX + 40, 464);
+} else {
+  ctx.fillStyle = '#111827';
+  ctx.beginPath();
+  ctx.arc(state.chickenX + 40, 458, 4, 0, Math.PI * 2);
   ctx.fill();
+}
 
   // Pico
   ctx.fillStyle = '#FF8000';
@@ -120,7 +138,7 @@ export const drawGame = (ctx, canvas, state, livesRef, scoreRef, effARef,difficu
   ctx.strokeStyle = '#EAB308';
   ctx.lineWidth = 1;
   ctx.stroke();
-  
+  ctx.restore();
 
   // 5. UI (vidas y score)
 
@@ -151,50 +169,53 @@ export const drawGame = (ctx, canvas, state, livesRef, scoreRef, effARef,difficu
 
 
   // 6. Alerta de Fatiga
+// 6. MENSAJE ÚNICO DE FEEDBACK
 
-  // Si hay fatiga activa
-  if (state.showFatigue) {
+let feedbackTitle = null;
+let feedbackSubtitle = null;
+let feedbackIsFatigue = false;
 
-    // Animación de pulso (parpadeo)
-    const pulse = Math.abs(Math.sin(state.frame * 0.1));
+if (state.showFatigue) {
+  const muscleName = state.fatiguedChannel === 'A'
+    ? 'FLEXOR'
+    : 'EXTENSOR';
 
-    // Color rojo con opacidad variable
-    ctx.fillStyle = `rgba(220, 38, 38, ${0.7 + pulse * 0.3})`;
+  const channelName = state.fatiguedChannel === 'A'
+    ? 'Canal A'
+    : 'Canal B';
 
-    // Ancho del mensaje
-    const msgWidth = 360;
+  feedbackTitle = '⚠️ ESFUERZO ELEVADO';
+  feedbackSubtitle = `Relajá el ${muscleName} (${channelName})`;
+  feedbackIsFatigue = true;
 
-    // Determina nombre del músculo según canal
-    const muscleName = state.fatiguedChannel === 'A'
-      ? 'FLEXOR (Canal A)'
-      : 'EXTENSOR (Canal B)';
+} else if (difficultyRef.current.feedbackMessage) {
+  feedbackTitle = difficultyRef.current.feedbackMessage;
+}
+if (feedbackTitle) {
+  const pulse = Math.abs(Math.sin(state.frame * 0.1));
 
-    // Centra el mensaje
-    const msgX = (canvas.width - msgWidth) / 2;
+  ctx.fillStyle = feedbackIsFatigue
+    ? `rgba(220, 38, 38, ${0.75 + pulse * 0.25})`
+    : 'rgba(0, 0, 0, 0.6)';
 
-    ctx.beginPath();
+  const boxWidth = 460;
+  const boxHeight = feedbackSubtitle ? 76 : 54;
+  const boxX = (canvas.width - boxWidth) / 2;
+  const boxY = 75;
 
-    // Dibuja fondo del mensaje
-    ctx.roundRect(msgX, 100, msgWidth, 75, 20);
-    ctx.fill();
-
-    // Texto principal
-    ctx.fillStyle = 'white';
-    ctx.textAlign = 'center';
-    ctx.font = 'bold 22px Arial';
-    ctx.fillText('⚠️ ESFUERZO ELEVADO', canvas.width / 2, 135);
-
-    // Texto secundario
-    ctx.font = '14px Arial'; 
-    ctx.fillText(`RELAJA EL ${muscleName}`, canvas.width / 2, 160);
-  }
-  if (difficultyRef.current.feedbackMessage) {
-  ctx.fillStyle = 'rgba(0,0,0,0.6)';
-  ctx.fillRect(200, 50, 400, 50);
+  ctx.beginPath();
+  ctx.roundRect(boxX, boxY, boxWidth, boxHeight, 18);
+  ctx.fill();
 
   ctx.fillStyle = 'white';
   ctx.textAlign = 'center';
-  ctx.font = '16px Arial';
-  ctx.fillText(difficultyRef.current.feedbackMessage, canvas.width / 2, 80);
+
+  ctx.font = 'bold 20px Arial';
+  ctx.fillText(feedbackTitle, canvas.width / 2, boxY + 32);
+
+  if (feedbackSubtitle) {
+    ctx.font = '16px Arial';
+    ctx.fillText(feedbackSubtitle, canvas.width / 2, boxY + 58);
+  }
 }
-};
+}

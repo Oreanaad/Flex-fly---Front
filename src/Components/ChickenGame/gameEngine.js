@@ -14,11 +14,6 @@ export const checkCollision = (r1, r2) => (
   r1.y + r1.h > r2.y
 );
 
-// Función que calcula el movimiento horizontal del personaje (pollo)
-// gameMode: modo del juego (FLEXION, EXTENSION, etc.)
-// effA: señal EMG del canal A
-// effB: señal EMG del canal B
-// currentX: posición actual en el eje X
 export const calculateMovement = (gameMode, effA, effB, currentX) => {
 
   // Velocidad base de movimiento (escala cuánto influye la señal EMG)

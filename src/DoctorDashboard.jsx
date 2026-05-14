@@ -256,11 +256,16 @@ const DoctorDashboard = () => {
                       INFO
                     </button>
                     <button 
-                      onClick={() => navigate('/calibration', { state: { patientId: pId } })}
-                      style={{...styles.primaryButton, flex: 2, justifyContent: 'center', padding: '10px'}}
-                    >
-                      START
-                    </button>
+                onClick={() => navigate('/calibration', { 
+                  state: { 
+                    patient: p,
+                    patientId: pId 
+                  } 
+                })}
+                style={{...styles.primaryButton, flex: 2, justifyContent: 'center', padding: '10px'}}
+              >
+                START
+              </button>
                   </div>
                 </div>
               );

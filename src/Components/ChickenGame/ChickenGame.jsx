@@ -4,20 +4,33 @@ import { drawGame } from './gameVisuals';
 import { checkCollision, calculateMovement } from './gameEngine';
 import '../../css/ChickenGame.css';
 import { calculateAdaptiveDifficulty } from './adaptiveEngine';
+import {generateSessionPDF} from '../../SessionPdf'
 
-const ChickenGame = ({ eff_A, eff_B, gameMode, patientId }) => {
+const normalizeEMG = (value, calibratedMax) => {
+  const raw = Number(value) || 0;
+  const max = Number(calibratedMax) || 0;
+
+  if (raw < 0.02) return 0; // 🔥 FILTRO DE RUIDO
+
+  if (max <= 0) {
+    return Math.min(100, raw * 100);
+  }
+
+  return Math.min(100, (raw / max) * 100);
+};
+
+const ChickenGame = ({ eff_A, eff_B, gameMode, patientId, maxA, maxB,patient }) => {
   const canvasRef = useRef(null);
 
   const [gameOver, setGameOver] = useState(false);
   const [score, setScore] = useState(0);
   const [lives, setLives] = useState(3);
-  const [startTime] = useState(Date.now());
-
-  // refs para evitar stale state dentro del loop
+  const [startTime, setStartTime] = useState(Date.now());
   const effARef = useRef(0);
   const effBRef = useRef(0);
   const scoreRef = useRef(0);
   const livesRef = useRef(3);
+  const SESSION_DURATION_MS = 4 * 60 * 1000;
 
   const gameState = useRef({
     chickenX: 400,
@@ -30,12 +43,13 @@ const ChickenGame = ({ eff_A, eff_B, gameMode, patientId }) => {
 
   const sessionHistory = useRef([]);
   const rocksHit = useRef(0);
-
+  const lastFeedbackTime = useRef(Date.now());
   const accumulator = useRef({ a: 0, b: 0, count: 0 });
   const lastSaveTime = useRef(Date.now());
-  const initialBaseline = useRef({ a: null, b: null });
+  const SAMPLE_WINDOW_MS = 5000;
+  const FEEDBACK_WINDOW_MS = 1000;
 
-  // capa adaptativa
+
   const difficultyRef = useRef({
     speedMultiplier: 1,
     wormSpawnRate: 0.02,
@@ -103,15 +117,47 @@ const ChickenGame = ({ eff_A, eff_B, gameMode, patientId }) => {
       };
 
       saveData();
+    generateSessionPDF({
+  patient: {
+    name: patient?.name,
+    age: patient?.age,
+    affected_side: patient?.affected_side,
+    medical_observation: patient?.medical_observation
+  },
+  metrics,
+  score,
+  sessionHistory: sessionHistory.current,
+  gameMode
+});
     }
-  }, [gameOver, patientId, gameMode, score, startTime]);
+  }, [gameOver, patientId, gameMode, score, startTime,patient]);
 
+  //Pollito muerto
+  useEffect(() => {
+  if (!gameOver) return;
+
+  const canvas = canvasRef.current;
+  if (!canvas) return;
+
+  const ctx = canvas.getContext('2d');
+
+  drawGame(
+    ctx,
+    canvas,
+    gameState.current,
+    livesRef,
+    scoreRef,
+    effARef,
+    difficultyRef,
+    true
+  );
+}, [gameOver]);
   // loop principal
   useEffect(() => {
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
     let animationId;
-
+   
     const update = () => {
       if (gameOver) return;
 
@@ -119,27 +165,33 @@ const ChickenGame = ({ eff_A, eff_B, gameMode, patientId }) => {
       state.frame++;
 
       const now = Date.now();
+    const normA = normalizeEMG(effARef.current, maxA);
+    const normB = normalizeEMG(effBRef.current, maxB);
+    const movementA = normA / 100;
+    const movementB = normB / 100;
 
-      // procesamiento cada 1 segundo
-      if (now - lastSaveTime.current >= 1000) {
+   
+if (now - lastFeedbackTime.current >= FEEDBACK_WINDOW_MS) {
+ const fatigueNow = normA >= 85 || normB >= 85;
+
+if (fatigueNow) {
+  adaptiveWindow.current.fatigueCount++;
+} else {
+  adaptiveWindow.current.fatigueCount = 0;
+}
+
+state.showFatigue = adaptiveWindow.current.fatigueCount >= 3;
+  state.fatiguedChannel = normA > normB ? 'A' : 'B';
+
+  lastFeedbackTime.current = now;
+}
+
+if (now - lastSaveTime.current >= SAMPLE_WINDOW_MS) {
         const count = accumulator.current.count || 1;
         const avgA = accumulator.current.a / count;
         const avgB = accumulator.current.b / count;
 
-        if (initialBaseline.current.a === null || avgA > initialBaseline.current.a)
-          initialBaseline.current.a = Math.max(avgA, 0.1);
-
-        if (initialBaseline.current.b === null || avgB > initialBaseline.current.b)
-          initialBaseline.current.b = Math.max(avgB, 0.1);
-
-        state.showFatigue =
-          (avgA >= initialBaseline.current.a * 0.9) ||
-          (avgB >= initialBaseline.current.b * 0.9);
-
-        state.fatiguedChannel = avgA > avgB ? 'A' : 'B';
-
-        if (state.showFatigue) adaptiveWindow.current.fatigueCount++;
-        if (avgA < 0.15 && avgB < 0.15) adaptiveWindow.current.lowActivityCount++;
+        if (avgA < 15 && avgB < 15) adaptiveWindow.current.lowActivityCount++;
 
         sessionHistory.current.push({
           t: new Date(now).toISOString(),
@@ -150,10 +202,13 @@ const ChickenGame = ({ eff_A, eff_B, gameMode, patientId }) => {
         accumulator.current = { a: 0, b: 0, count: 0 };
         lastSaveTime.current = now;
       }
-
+         if (now - startTime >= SESSION_DURATION_MS) {
+      setGameOver(true);
+      return;
+    }
       // acumulación por frame
-      accumulator.current.a += Number(effARef.current) || 0;
-      accumulator.current.b += Number(effBRef.current) || 0;
+      accumulator.current.a += normA;
+      accumulator.current.b += normB;
       accumulator.current.count += 1;
 
       // adaptación cada 5 segundos
@@ -161,10 +216,19 @@ const ChickenGame = ({ eff_A, eff_B, gameMode, patientId }) => {
   const windowStats = {
     scoreGain: scoreRef.current - adaptiveWindow.current.scoreStart,
     rocksHit: rocksHit.current - adaptiveWindow.current.rocksStart,
-    fatigueDetected: adaptiveWindow.current.fatigueCount >= 2,
+    fatigueDetected: adaptiveWindow.current.fatigueCount >= 1,
     inactivityDetected: adaptiveWindow.current.lowActivityCount >= 3
   };
-
+console.log("EMG raw/calibrated:", {
+  effA: effARef.current,
+  effB: effBRef.current,
+  maxA,
+  maxB,
+  normA,
+  normB,
+  movementA,
+  movementB
+});
   console.log("📊 Window stats:", windowStats);
 
   difficultyRef.current = calculateAdaptiveDifficulty(
@@ -185,17 +249,16 @@ const ChickenGame = ({ eff_A, eff_B, gameMode, patientId }) => {
 }
 
       // movimiento
-      state.chickenX = calculateMovement(
+          state.chickenX = calculateMovement(
         gameMode,
-        effARef.current,
-        effBRef.current,
+        movementA,
+        movementB,
         state.chickenX
       );
-
       const level = Math.floor(scoreRef.current / 10);
 
-      const currentSpeed =
-        (2 + (level * 1.2)) * difficultyRef.current.speedMultiplier;
+     const currentSpeed =
+  (1.6 + (level * 0.45)) * difficultyRef.current.speedMultiplier;
 
       if (
         state.worms.length < (3 + level) &&
@@ -236,27 +299,76 @@ const ChickenGame = ({ eff_A, eff_B, gameMode, patientId }) => {
       state.worms = state.worms.filter(w => w.y < canvas.height);
       state.rocks = state.rocks.filter(r => r.y < canvas.height);
 
-      drawGame(ctx, canvas, state, livesRef, scoreRef, effARef, difficultyRef);
+      drawGame(ctx, canvas, state, livesRef, scoreRef, effARef, difficultyRef, gameOver);
 
       animationId = requestAnimationFrame(update);
     };
 
     update();
     return () => cancelAnimationFrame(animationId);
-  }, [gameOver, gameMode]);
+  }, [gameOver, gameMode, maxA, maxB]);
+  const startNewSession = () => {
+  setGameOver(false);
+  setScore(0);
+  setLives(3);
 
+  scoreRef.current = 0;
+  livesRef.current = 3;
+  rocksHit.current = 0;
+
+  sessionHistory.current = [];
+  accumulator.current = { a: 0, b: 0, count: 0 };
+
+  lastSaveTime.current = Date.now();
+  lastFeedbackTime.current = Date.now();
+  lastDifficultyUpdate.current = Date.now();
+
+  adaptiveWindow.current = {
+    scoreStart: 0,
+    rocksStart: 0,
+    lowActivityCount: 0,
+    fatigueCount: 0
+  };
+
+  difficultyRef.current = {
+    speedMultiplier: 1,
+    wormSpawnRate: 0.02,
+    rockSpawnRate: 0.002,
+    feedbackMessage: null
+  };
+
+  gameState.current = {
+    chickenX: 400,
+    worms: [],
+    rocks: [],
+    frame: 0,
+    showFatigue: false,
+    fatiguedChannel: null
+  };
+  setStartTime(Date.now());
+};
   return (
     <div className="game-wrapper">
       <canvas ref={canvasRef} width={800} height={550} className="game-canvas" />
-      {gameOver && (
-        <div className="game-over-overlay">
-          <h2 className="game-over-title">SESIÓN TERMINADA</h2>
-          <p className="game-over-score">{score} LOMBRICES RECOLECTADAS</p>
-          <button onClick={() => window.location.reload()} className="new-session-btn">
-            NUEVA SESIÓN
-          </button>
-        </div>
-      )}
+     {gameOver && (
+  <div className="game-over-overlay">
+    <h2 className="game-over-title">GAME OVER</h2>
+    <p className="game-over-score">{score} LOMBRICES RECOLECTADAS</p>
+
+    <div className="game-over-actions">
+      <button onClick={startNewSession} className="new-session-btn">
+        NUEVA SESIÓN
+      </button>
+
+      <button
+        onClick={() => window.location.href = '/calibration'}
+        className="recalibrate-btn"
+      >
+        RECALIBRAR
+      </button>
+    </div>
+  </div>
+)}
     </div>
   );
 };

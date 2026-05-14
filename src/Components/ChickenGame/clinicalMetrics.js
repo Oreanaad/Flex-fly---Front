@@ -4,13 +4,14 @@
 // score: puntaje final
 // rocksHit: cantidad de errores (rocas)
 // startTime: timestamp de inicio de sesión
+
 export const calculateClinicalMetrics = (history, score, rocksHit, startTime) => {
   // Si no hay datos, devuelve todas las métricas en 0
   if (history.length === 0) return { si: 0, cr: 0, fatigue: 0, ce: 0 };
 
   // Umbral de activación muscular (por encima de esto se considera “activo”)
   const ACTIVATION_THRESHOLD = 0.15; 
-
+  
   // Contador de tiempo total donde hay actividad muscular en al menos un canal
   let t_muscle_activity = 0;
 

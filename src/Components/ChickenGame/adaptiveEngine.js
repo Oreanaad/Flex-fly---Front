@@ -1,22 +1,44 @@
 export const calculateAdaptiveDifficulty = (windowStats, currentDifficulty) => {
-  console.log("🧠 adaptiveEngine recibió:", windowStats);
-
   let next = { ...currentDifficulty };
-if (windowStats.fatigueDetected || windowStats.rocksHit >= 1) {
-  next.speedMultiplier = Math.max(0.7, next.speedMultiplier - 0.1);
-  next.wormSpawnRate = Math.max(0.01, next.wormSpawnRate - 0.002);
-  next.rockSpawnRate = Math.max(0.0005, next.rockSpawnRate - 0.0003);
-  next.feedbackMessage = "Take a short rest and move gently";
-} else if (windowStats.scoreGain >= 3 && windowStats.rocksHit === 0 && !windowStats.inactivityDetected) {
-  next.speedMultiplier = Math.min(1.6, next.speedMultiplier + 0.1);
-  next.wormSpawnRate = Math.min(0.04, next.wormSpawnRate + 0.002);
-  next.rockSpawnRate = Math.min(0.006, next.rockSpawnRate + 0.0003);
-  next.feedbackMessage = "Great control, keep it steady";
-} else if (windowStats.inactivityDetected) {
-  next.feedbackMessage = "Activate a bit more to keep moving";
-} else {
+
+  const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
+
+  const MIN_SPEED = 0.75;
+  const MAX_SPEED = 1.2;
+
+  const MIN_WORM_RATE = 0.015;
+  const MAX_WORM_RATE = 0.024;
+
+  const MIN_ROCK_RATE = 0.001;
+  const MAX_ROCK_RATE = 0.0024;
+
   next.feedbackMessage = null;
-}
+
+  if (windowStats.fatigueDetected || windowStats.rocksHit > 0) {
+    next.speedMultiplier -= 0.15;
+    next.wormSpawnRate -= 0.003;
+    next.rockSpawnRate -= 0.0004;
+    next.feedbackMessage = 'Take a short rest and move gently';
+
+  } else if (windowStats.scoreGain <= 1) {
+    next.speedMultiplier -= 0.08;
+    next.wormSpawnRate -= 0.002;
+    next.rockSpawnRate -= 0.0002;
+    next.feedbackMessage = 'Slowing down to match your control';
+
+  } else if (windowStats.scoreGain >= 3) {
+    next.speedMultiplier += 0.04;
+    next.wormSpawnRate += 0.001;
+    next.rockSpawnRate += 0.0001;
+    next.feedbackMessage = 'Good control, small challenge increase';
+
+  } else {
+    next.feedbackMessage = 'Keep a steady rhythm';
+  }
+
+  next.speedMultiplier = clamp(next.speedMultiplier, MIN_SPEED, MAX_SPEED);
+  next.wormSpawnRate = clamp(next.wormSpawnRate, MIN_WORM_RATE, MAX_WORM_RATE);
+  next.rockSpawnRate = clamp(next.rockSpawnRate, MIN_ROCK_RATE, MAX_ROCK_RATE);
 
   return next;
 };

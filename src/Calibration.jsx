@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Calibration.css';
 
-const Calibration = ({ isConnected, connectSerial, raw_A, raw_B, onComplete }) => {
+const Calibration = ({ isConnected, connectSerial, raw_A, raw_B, onComplete, patient, patientId })=> {
   const navigate = useNavigate();
   const [activeMode, setActiveMode] = useState('COMBINED');
   const [isCalibrating, setIsCalibrating] = useState(false);
@@ -135,7 +135,14 @@ useEffect(() => {
         const finalMaxB = tempMax.b > 0.02 ? tempMax.b : 0.01;
 
         onComplete({ maxA: finalMaxA, maxB: finalMaxB }, activeMode);
-        setTimeout(() => navigate('/game'), 800);
+       setTimeout(() => navigate('/game', {
+  state: {
+    patient,
+    patientId,
+    limits: { maxA: finalMaxA, maxB: finalMaxB },
+    mode: activeMode
+  }
+}), 800);
       }
     }
   }, [isCalibrating, timeLeft, phase, activeMode]);
