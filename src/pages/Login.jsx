@@ -37,13 +37,22 @@ const BionicLogin = ({ onLoginSuccess }) => {
           <ChickenVisual />
         </div>
         <h1 className="login-title">
-          Log in and manage your <br/>
-          <span className="highlight-yellow">Patients</span>
+          Log in and manage your
+          <span className="highlight-yellow"> patients</span>
         </h1>
-        <p className="login-subtitle">
+       
+        <button 
+        type="button"
+        onClick={() => navigate('/LoginPatients')}
+        className="login-buttonDr"
+      >
+        Are you a patient? Log in as patient
+      </button> 
+      <p className="login-subtitle">
           Bionic Rehabilitation Software of Kawatek.
         </p>
-      </div>
+   </div>
+
 
       {/* SECCIÓN DERECHA: Formulario */}
       <div className="login-form-section">
@@ -103,6 +112,13 @@ const BionicLogin = ({ onLoginSuccess }) => {
                   >
                     Doesn't have an account? Sign up!
                   </span>
+                  <br/>
+                  <span 
+                  onClick={() => navigate('/forgot-password/doctor')} 
+                  className="link-text"
+                >
+                  Forgot your password?
+                </span>
                 </p>
               </div>  
             </div>

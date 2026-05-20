@@ -201,3 +201,354 @@ html, body {
 /* Si usas el App.js que vimos antes, quita el bg-slate-950 del div padre 
    para que no "ensucie" los bordes del login */
 }
+
+
+.game-help-button-wrapper {
+  display: flex;
+  justify-content: center;
+  margin: 18px 0 10px 0;
+}
+
+.game-help-button {
+  border: 1px solid rgba(199, 199, 199, 0.55);
+  background: rgba(250, 204, 21, 0.12);
+  color: #b8b8b7;
+  padding:  8px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.2s ease;
+margin: 5px 5px;
+}
+
+.game-help-button:hover {
+  background: rgba(250, 204, 21, 0.22);
+  transform: translateY(-2px);
+}
+
+.game-help-button:active {
+  transform: translateY(0);
+}
+
+.game-page-shell {
+  min-height: 100vh;
+  width: 100%;
+  background:
+    radial-gradient(circle at top, rgba(124, 58, 237, 0.18), transparent 34%),
+    linear-gradient(180deg, #0f172a 0%, #020617 100%);
+  color: #ffffff;
+  padding: 44px 24px 64px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.game-page-header {
+  text-align: center;
+  max-width: 780px;
+  margin-bottom: 24px;
+}
+
+.game-phase-badge {
+  display: inline-block;
+  margin-bottom: 12px;
+  padding: 7px 14px;
+  border-radius: 999px;
+  background: rgba(250, 204, 21, 0.14);
+  border: 1px solid rgba(250, 204, 21, 0.45);
+  color: #facc15;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.9px;
+  text-transform: uppercase;
+}
+
+.game-page-title {
+  margin: 0;
+  color: #ffffff;
+  font-size: 36px;
+  font-weight: 900;
+  letter-spacing: -0.8px;
+}
+
+.game-page-subtitle {
+  margin: 10px auto 0;
+  color: #cbd5e1;
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+.game-stage-card {
+  width: fit-content;
+  max-width: 100%;
+  padding: 22px;
+  border-radius: 28px;
+  background: rgba(15, 23, 42, 0.72);
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  box-shadow: 0 28px 90px rgba(0, 0, 0, 0.34);
+  position: relative;
+}
+
+.game-telemetry-card {
+  position: absolute;
+  top: -16px;
+  left: 22px;
+  z-index: 20;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding: 10px 14px;
+  border-radius: 999px;
+  background: rgba(2, 6, 23, 0.88);
+  border: 1px solid rgba(148, 163, 184, 0.24);
+  color: #cbd5e1;
+  font-size: 12px;
+  font-weight: 800;
+  box-shadow: 0 12px 34px rgba(0, 0, 0, 0.28);
+}
+
+.game-telemetry-title {
+  color: #facc15;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+}
+
+.game-help-button {
+  margin-bottom: 18px;
+  border: 1px solid rgba(250, 204, 21, 0.55);
+  background: rgba(15, 23, 42, 0.88);
+  color: #facc15;
+  padding: 11px 19px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 900;
+  letter-spacing: 0.7px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.22s ease;
+  box-shadow: 0 14px 38px rgba(0, 0, 0, 0.26);
+}
+
+.game-help-button:hover {
+  background: rgba(250, 204, 21, 0.18);
+  transform: translateY(-2px);
+}
+
+.game-help-button:active {
+  transform: translateY(0);
+}
+.compact-game-page {
+  min-height: 100vh;
+  height: 100vh;
+  overflow: hidden;
+  padding: 18px 18px 12px;
+  background:
+    radial-gradient(circle at top, rgba(124, 58, 237, 0.18), transparent 34%),
+    linear-gradient(180deg, #0f172a 0%, #020617 100%);
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.game-compact-header {
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.game-phase-badge {
+  display: inline-block;
+  margin-bottom: 6px;
+  padding: 6px 13px;
+  border-radius: 999px;
+  background: rgba(250, 204, 21, 0.12);
+  border: 1px solid rgba(250, 204, 21, 0.45);
+  color: #facc15;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+}
+
+.game-page-title {
+  margin: 0;
+  color: #ffffff;
+  font-size: 28px;
+  font-weight: 900;
+  letter-spacing: -0.6px;
+}
+
+.game-page-subtitle {
+  margin: 4px auto 0;
+  color: #cbd5e1;
+  font-size: 14px;
+  line-height: 1.35;
+}
+
+.compact-stage-card {
+  width: fit-content;
+  max-width: 100%;
+  padding: 14px;
+  border-radius: 24px;
+  background: rgba(15, 23, 42, 0.74);
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.34);
+  position: relative;
+}
+
+.game-telemetry-pills {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 9px;
+  margin-bottom: 9px;
+  color: #cbd5e1;
+  font-size: 12px;
+  font-weight: 800;
+  flex-wrap: wrap;
+}
+
+.game-telemetry-pills span {
+  color: #facc15;
+  text-transform: uppercase;
+  letter-spacing: 0.7px;
+}
+
+.game-telemetry-pills strong {
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(2, 6, 23, 0.82);
+  border: 1px solid rgba(148, 163, 184, 0.24);
+  color: #e2e8f0;
+}
+
+.game-help-floating {
+  position: fixed;
+  top: 18px;
+  right: 18px;
+  z-index: 80;
+  border: 1px solid rgba(250, 204, 21, 0.55);
+  background: rgba(15, 23, 42, 0.9);
+  color: #facc15;
+  padding: 10px 17px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.7px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.22s ease;
+  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.28);
+}
+
+.game-help-floating:hover {
+  background: rgba(250, 204, 21, 0.16);
+  transform: translateY(-2px);
+}
+button.kawatek-gameover-btn {
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  border: none !important;
+  outline: none !important;
+  border-radius: 999px !important;
+  padding: 13px 26px !important;
+  min-width: 155px !important;
+  font-size: 12px !important;
+  font-weight: 900 !important;
+  letter-spacing: 0.9px !important;
+  text-transform: uppercase !important;
+  cursor: pointer !important;
+  transition: all 0.22s ease !important;
+}
+/* ================================
+   GAME OVER BUTTONS - CLEAN MEDICAL STYLE
+================================ */
+
+button.kawatek-gameover-btn {
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  outline: none !important;
+  border-radius: 14px !important;
+  padding: 13px 26px !important;
+  min-width: 155px !important;
+  font-size: 12px !important;
+  font-weight: 900 !important;
+  letter-spacing: 0.9px !important;
+  text-transform: uppercase !important;
+  cursor: pointer !important;
+  transition: all 0.22s ease !important;
+}
+
+/* Main action */
+button.kawatek-gameover-btn-primary {
+  background: linear-gradient(135deg, #14b8a6, #0f766e) !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(20, 184, 166, 0.7) !important;
+  box-shadow: 0 12px 30px rgba(20, 184, 166, 0.28) !important;
+}
+
+button.kawatek-gameover-btn-primary:hover {
+  background: linear-gradient(135deg, #2dd4bf, #0d9488) !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 16px 40px rgba(20, 184, 166, 0.38) !important;
+}
+
+/* Secondary action */
+button.kawatek-gameover-btn-secondary {
+  background: rgba(15, 23, 42, 0.95) !important;
+  color: #cbd5e1 !important;
+  border: 1px solid rgba(148, 163, 184, 0.45) !important;
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.28) !important;
+}
+
+button.kawatek-gameover-btn-secondary:hover {
+  color: #ffffff !important;
+  border-color: rgba(20, 184, 166, 0.65) !important;
+  background: rgba(20, 184, 166, 0.12) !important;
+  transform: translateY(-2px) !important;
+}
+
+button.kawatek-gameover-btn:active {
+  transform: translateY(0) !important;
+}
+.game-countdown-screen {
+  width: 800px;
+  max-width: 100%;
+  height: 550px;
+  max-height: 58vh;
+  border-radius: 18px;
+  background:
+    radial-gradient(circle at center, rgba(20, 184, 166, 0.16), transparent 42%),
+    linear-gradient(180deg, #0f172a 0%, #020617 100%);
+  border: 1px solid rgba(148, 163, 184, 0.24);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.28);
+}
+
+.game-countdown-label {
+  margin: 0 0 10px;
+  color: #14b8a6;
+  font-size: 18px;
+  font-weight: 900;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.game-countdown-number {
+  margin: 0;
+  color: #ffffff;
+  font-size: 86px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.game-countdown-text {
+  margin: 14px 0 0;
+  color: #cbd5e1;
+  font-size: 16px;
+  font-weight: 600;
+}

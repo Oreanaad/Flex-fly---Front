@@ -1,16 +1,147 @@
-.game-over-actions {
+/* ================================
+   CHICKEN GAME WRAPPER
+================================ */
+
+.chicken-game-wrapper {
   display: flex;
-  gap: 12px;
-  justify-content: center;
-  margin-top: 16px;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  max-height: calc(100vh - 190px);
 }
 
-.recalibrate-btn {
-  background: #334155;
-  color: white;
-  border: none;
-  padding: 12px 20px;
-  border-radius: 10px;
-  font-weight: bold;
-  cursor: pointer;
+.chicken-game-canvas {
+  display: block;
+  width: 800px;
+  max-width: 100%;
+  max-height: 58vh;
+  border-radius: 18px;
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.28);
+}
+
+
+/* ================================
+   GAME OVER PANEL
+================================ */
+
+.game-over-panel-compact {
+  margin: 10px auto 0;
+  width: fit-content;
+  min-width: 360px;
+  max-width: 520px;
+  padding: 16px 24px 18px;
+  border-radius: 22px;
+  background: rgba(15, 23, 42, 0.72);
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  text-align: center;
+  box-shadow: 0 18px 54px rgba(0, 0, 0, 0.26);
+  backdrop-filter: blur(10px);
+}
+.game-over-title {
+  margin: 0;
+  color: #ffffff;
+  font-size: 24px;
+  font-weight: 900;
+  line-height: 1.1;
+}
+
+.game-over-score {
+  margin: 20px 0 14px;
+  color: #cbd5e1;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.game-over-score strong {
+  color: #facc15;
+  font-size: 18px;
+}
+
+
+/* ================================
+   GAME OVER BUTTONS - CLEAN MEDICAL STYLE
+================================ */
+
+.kawatek-gameover-actions {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  gap: 14px !important;
+  margin-top: 20px !important;
+  flex-wrap: wrap !important;
+}
+
+.kawatek-gameover-btn {
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  outline: none !important;
+  border-radius: 14px !important;
+  padding: 13px 26px !important;
+  min-width: 155px !important;
+  font-size: 12px !important;
+  font-weight: 900 !important;
+  letter-spacing: 0.9px !important;
+  text-transform: uppercase !important;
+  cursor: pointer !important;
+  transition: all 0.22s ease !important;
+}
+
+/* New Session - main action */
+.kawatek-gameover-btn-primary {
+  background: linear-gradient(135deg, #14b8a6, #0f766e) !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(20, 184, 166, 0.7) !important;
+  box-shadow: 0 12px 30px rgba(20, 184, 166, 0.28) !important;
+}
+
+.kawatek-gameover-btn-primary:hover {
+  background: linear-gradient(135deg, #2dd4bf, #0d9488) !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 16px 40px rgba(20, 184, 166, 0.38) !important;
+}
+
+/* Recalibrate - secondary action */
+.kawatek-gameover-btn-secondary {
+  background: rgba(15, 23, 42, 0.95) !important;
+  color: #cbd5e1 !important;
+  border: 1px solid rgba(148, 163, 184, 0.45) !important;
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.28) !important;
+}
+
+.kawatek-gameover-btn-secondary:hover {
+  color: #ffffff !important;
+  border-color: rgba(20, 184, 166, 0.65) !important;
+  background: rgba(20, 184, 166, 0.12) !important;
+  transform: translateY(-2px) !important;
+}
+
+.kawatek-gameover-btn:active {
+  transform: translateY(0) !important;
+}
+
+/* ================================
+   RESPONSIVE
+================================ */
+
+@media (max-width: 900px) {
+  .chicken-game-canvas {
+    width: 100%;
+    max-height: 55vh;
+  }
+
+  .game-over-panel-compact {
+    min-width: auto;
+    width: 92%;
+  }
+}
+
+@media (max-width: 600px) {
+  .kawatek-gameover-actions {
+    flex-direction: column !important;
+    gap: 10px !important;
+  }
+
+  .kawatek-gameover-btn {
+    width: 100% !important;
+  }
 }

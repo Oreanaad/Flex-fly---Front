@@ -81,6 +81,18 @@ const handleSubmit = async (e) => {
           <form onSubmit={handleSubmit}>
             <div className="registro-form-flex">
               <div className="input-group">
+                <label className="input-label">Username</label>
+                <input 
+                    type="text" 
+                    placeholder="Your name"
+                    className="registro-input"
+                    value={username} 
+                    onChange={(e) => setUsername(e.target.value)}
+                    required
+                    disabled={loading}
+                />
+                </div>
+              <div className="input-group">
                 <label className="input-label">Email</label>
                 <input 
                   type="email" 

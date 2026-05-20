@@ -66,3 +66,32 @@ button:hover {
         height: auto;
     }
 }
+
+
+.help-button-wrapper {
+  display: flex;
+  justify-content: center;
+  margin: 18px 0 10px 0;
+}
+
+.help-button {
+  border: 1px solid rgba(250, 204, 21, 0.55);
+  background: rgba(250, 204, 21, 0.12);
+  color: #facc15;
+  padding:  8px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-top: 0;
+}
+
+.help-button:hover {
+  background: rgba(250, 204, 21, 0.22);
+  transform: translateY(-2px);
+}
+
+.help-button:active {
+  transform: translateY(0);
+}

@@ -5,6 +5,7 @@ import { checkCollision, calculateMovement } from './gameEngine';
 import '../../css/ChickenGame.css';
 import { calculateAdaptiveDifficulty } from './adaptiveEngine';
 import {generateSessionPDF} from '../../SessionPdf'
+import { useNavigate } from 'react-router-dom';
 
 const normalizeEMG = (value, calibratedMax) => {
   const raw = Number(value) || 0;
@@ -31,6 +32,7 @@ const ChickenGame = ({ eff_A, eff_B, gameMode, patientId, maxA, maxB,patient }) 
   const scoreRef = useRef(0);
   const livesRef = useRef(3);
   const SESSION_DURATION_MS = 4 * 60 * 1000;
+  const navigate = useNavigate();
 
   const gameState = useRef({
     chickenX: 400,
@@ -40,15 +42,34 @@ const ChickenGame = ({ eff_A, eff_B, gameMode, patientId, maxA, maxB,patient }) 
     showFatigue: false,
     fatiguedChannel: null
   });
+  
+  useEffect(() => {
+  if (forceGameOver) {
+    setScore(29);
+    scoreRef.current = 29;
+    setLives(0);
+    livesRef.current = 0;
+    setGameOver(true);
+  }
+}, []);
 
+const handleRecalibrate = () => {
+  navigate('/patient-calibration', {
+    state: {
+      patient,
+      patientId
+    }
+  });
+};
   const sessionHistory = useRef([]);
   const rocksHit = useRef(0);
   const lastFeedbackTime = useRef(Date.now());
   const accumulator = useRef({ a: 0, b: 0, count: 0 });
   const lastSaveTime = useRef(Date.now());
-  const SAMPLE_WINDOW_MS = 5000;
+  const SAMPLE_WINDOW_MS = 3000;
   const FEEDBACK_WINDOW_MS = 1000;
-
+  const forceGameOver =
+  new URLSearchParams(window.location.search).get('debugGameOver') === 'true';
 
   const difficultyRef = useRef({
     speedMultiplier: 1,
@@ -119,10 +140,13 @@ const ChickenGame = ({ eff_A, eff_B, gameMode, patientId, maxA, maxB,patient }) 
       saveData();
     generateSessionPDF({
   patient: {
+    id: patientId,
     name: patient?.name,
     age: patient?.age,
     affected_side: patient?.affected_side,
-    medical_observation: patient?.medical_observation
+    condition: patient?.condition,
+    serial_number: patient?.serial_number,
+    email: patient?.email
   },
   metrics,
   score,
@@ -348,29 +372,37 @@ console.log("EMG raw/calibrated:", {
   setStartTime(Date.now());
 };
   return (
-    <div className="game-wrapper">
-      <canvas ref={canvasRef} width={800} height={550} className="game-canvas" />
-     {gameOver && (
-  <div className="game-over-overlay">
-    <h2 className="game-over-title">GAME OVER</h2>
-    <p className="game-over-score">{score} LOMBRICES RECOLECTADAS</p>
+  <div className="chicken-game-wrapper">
+    <canvas
+      ref={canvasRef}
+      width={800}
+      height={550}
+      className="chicken-game-canvas"
+    />
 
-    <div className="game-over-actions">
-      <button onClick={startNewSession} className="new-session-btn">
-        NUEVA SESIÓN
-      </button>
+   {gameOver && (
+  <div className="game-over-panel-compact">
+    <h2 className="game-over-title">Game Over</h2>
+
+    <p className="game-over-score">
+      <strong>{score}</strong> worms collected
+    </p>
+
+    <div className="kawatek-gameover-actions">
+      
 
       <button
-        onClick={() => window.location.href = '/calibration'}
-        className="recalibrate-btn"
+        type="button"
+        className="kawatek-gameover-btn kawatek-gameover-btn-secondary"
+        onClick={handleRecalibrate}
       >
-        RECALIBRAR
+        Recalibrate
       </button>
     </div>
   </div>
 )}
-    </div>
-  );
+  </div>
+);
 };
 
 export default ChickenGame;

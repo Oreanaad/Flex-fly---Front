@@ -108,6 +108,154 @@ export const AuthProvider = ({ children }) => {
         }
     }, [API_BASE_URL]);
 
+    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
+const registerPatient = async (username, email, password, serialNumber) => {
+  try {
+    const response = await fetch(`${API_URL}/api/patient-users/register`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        username,
+        email,
+        password,
+         serial_number: serialNumber
+      })
+    });
+
+    const data = await response.json();
+    return data;
+
+  } catch (error) {
+    console.error('Patient register error:', error);
+
+    return {
+      success: false,
+      message: 'Server error while registering patient.'
+    };
+  }
+};
+const forgotPasswordDoctor = async (email) => {
+  try {
+    const response = await fetch(`${API_URL}/api/auth/forgot-password`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ email })
+    });
+
+    return await response.json();
+
+  } catch (error) {
+    console.error('Doctor forgot password error:', error);
+
+    return {
+      success: false,
+      message: 'Server error while requesting password reset.'
+    };
+  }
+};
+
+const forgotPasswordPatient = async (email) => {
+  try {
+    const response = await fetch(`${API_URL}/api/patient-users/forgot-password`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ email })
+    });
+
+    return await response.json();
+
+  } catch (error) {
+    console.error('Patient forgot password error:', error);
+
+    return {
+      success: false,
+      message: 'Server error while requesting password reset.'
+    };
+  }
+};
+
+const resetPasswordDoctor = async (token, password) => {
+  try {
+    const response = await fetch(`${API_URL}/api/auth/reset-password/${token}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ password })
+    });
+
+    return await response.json();
+
+  } catch (error) {
+    console.error('Doctor reset password error:', error);
+
+    return {
+      success: false,
+      message: 'Server error while resetting password.'
+    };
+  }
+};
+
+const resetPasswordPatient = async (token, password) => {
+  try {
+    const response = await fetch(`${API_URL}/api/patient-users/reset-password/${token}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ password })
+    });
+
+    return await response.json();
+
+  } catch (error) {
+    console.error('Patient reset password error:', error);
+
+    return {
+      success: false,
+      message: 'Server error while resetting password.'
+    };
+  }
+};
+const loginPatient = async (email, password) => {
+  try {
+    const response = await fetch(`${API_URL}/api/patient-users/login`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        email,
+        password
+      })
+    });
+
+    const data = await response.json();
+
+   if (data.success) {
+  localStorage.setItem('patient', JSON.stringify(data.patient));
+  localStorage.setItem('userType', 'patient');
+  localStorage.setItem('patientId', data.patient.clinical_patient_id);
+}
+
+    return data;
+
+  } catch (error) {
+    console.error('Patient login error:', error);
+
+    return {
+      success: false,
+      message: 'Server error while logging patient.'
+    };
+  }
+};
     const logout = useCallback(() => {
         setToken(null);
         setUser(null);
@@ -122,9 +270,15 @@ export const AuthProvider = ({ children }) => {
         isAuthenticated,
         loading,
         register,
-        verifyEmailToken, // <--- EXPORTADA
+        verifyEmailToken, 
         login,
         logout,
+        loginPatient,
+        registerPatient,
+        forgotPasswordDoctor,
+        forgotPasswordPatient,
+        resetPasswordDoctor,
+        resetPasswordPatient
     };
 
     return (
