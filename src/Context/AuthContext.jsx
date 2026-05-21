@@ -110,7 +110,7 @@ const API_BASE_URL = import.meta.env.VITE_APP_API_URL || 'http://localhost:5000'
    
 const registerPatient = async (username, email, password, serialNumber) => {
   try {
-    const response = await fetch(`${API_URL}/api/patient-users/register`, {
+    const response = await fetch(`${API_BASE_URL}/api/patient-users/register`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -137,7 +137,7 @@ const registerPatient = async (username, email, password, serialNumber) => {
 };
 const forgotPasswordDoctor = async (email) => {
   try {
-    const response = await fetch(`${API_URL}/api/auth/forgot-password`, {
+    const response = await fetch(`${API_BASE_URL}/api/auth/forgot-password`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -159,7 +159,7 @@ const forgotPasswordDoctor = async (email) => {
 
 const forgotPasswordPatient = async (email) => {
   try {
-    const response = await fetch(`${API_URL}/api/patient-users/forgot-password`, {
+    const response = await fetch(`${API_BASE_URL}/api/patient-users/forgot-password`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -181,7 +181,7 @@ const forgotPasswordPatient = async (email) => {
 
 const resetPasswordDoctor = async (token, password) => {
   try {
-    const response = await fetch(`${API_URL}/api/auth/reset-password/${token}`, {
+    const response = await fetch(`${API_BASE_URL}/api/auth/reset-password/${token}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -203,7 +203,7 @@ const resetPasswordDoctor = async (token, password) => {
 
 const resetPasswordPatient = async (token, password) => {
   try {
-    const response = await fetch(`${API_URL}/api/patient-users/reset-password/${token}`, {
+    const response = await fetch(`${API_BASE_URL}/api/patient-users/reset-password/${token}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -224,7 +224,7 @@ const resetPasswordPatient = async (token, password) => {
 };
 const loginPatient = async (email, password) => {
   try {
-    const response = await fetch(`${API_URL}/api/patient-users/login`, {
+    const response = await fetch(`${API_BASE_URL}/api/patient-users/login`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
