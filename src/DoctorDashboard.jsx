@@ -122,7 +122,7 @@ const DoctorDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [selectedPatient, setSelectedPatient] = useState(null);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
-
+  const [viewMode, setViewMode] = useState('all'); // all | mine
   const handleViewPatient = (patient) => {
     setSelectedPatient(patient);
     setIsViewModalOpen(true);
@@ -130,25 +130,37 @@ const DoctorDashboard = () => {
   
   const API_URL = import.meta.env.VITE_APP_API_URL;
 
-  useEffect(() => {
-    const fetchPatients = async () => {
-      if (!user?.id) return;
-      try {
-        const response = await fetch(`${API_URL}/api/patients/doctor/${user.id}`, {
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
-        if (response.ok) {
-          const data = await response.json();
-          setPatients(data);
-        }
-      } catch (error) {
-        console.error("Error loading patients:", error);
-      } finally {
-        setLoading(false);
+useEffect(() => {
+  const fetchPatients = async () => {
+    if (!user?.id) return;
+
+    setLoading(true);
+
+    try {
+      const endpoint =
+        viewMode === 'mine'
+          ? `${API_URL}/api/doctors/${user.id}/my-patients`
+          : `${API_URL}/api/patients/all/${user.id}`;
+
+      const response = await fetch(endpoint, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setPatients(data);
+      } else {
+        console.error("Error response loading patients:", response.status);
       }
-    };
-    fetchPatients();
-  }, [user, token, API_URL]);
+    } catch (error) {
+      console.error("Error loading patients:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  fetchPatients();
+}, [user, token, API_URL, viewMode]);
 
   const handleSavePatient = async (patientData) => {
     try {
@@ -193,7 +205,49 @@ const DoctorDashboard = () => {
       }
     }
   };
+const handleAssignPatient = async (patientId) => {
+  try {
+    const response = await fetch(`${API_URL}/api/doctors/${user.id}/assign-patient/${patientId}`, {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
 
+    const result = await response.json();
+
+    if (result.success) {
+      setPatients(prev =>
+        prev.map(p =>
+          (p.id || p._id) === patientId
+            ? { ...p, assigned_to_me: true }
+            : p
+        )
+      );
+    } else {
+      alert(result.message || "Could not assign patient.");
+    }
+  } catch (error) {
+    alert("Connection error while assigning patient.");
+  }
+};
+
+const handleRemoveFromMyPatients = async (patientId) => {
+  try {
+    const response = await fetch(`${API_URL}/api/doctors/${user.id}/remove-patient/${patientId}`, {
+      method: 'PUT',
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+
+    const result = await response.json();
+
+    if (result.success) {
+      setPatients(prev => prev.filter(p => (p.id || p._id) !== patientId));
+    } else {
+      alert(result.message || "Could not remove patient.");
+    }
+  } catch (error) {
+    alert("Connection error while removing patient.");
+  }
+};
   return (
     <div style={styles.dashboardContainer}>
       <aside style={styles.sidebar}>
@@ -202,20 +256,46 @@ const DoctorDashboard = () => {
           <p style={styles.logoSubtext}>Bionic Rehab System</p>
         </div>
         <nav>
-          <div style={{...styles.navLink, ...styles.navLinkActive}}>👥 &nbsp; Patients</div>
-          <div style={styles.navLink}>📊 &nbsp; Session History</div>
-        </nav>
-        <div style={{marginTop: 'auto', fontSize: '13px', color: '#94a3b8', textAlign: 'center'}}>
+             <div
+          style={{
+            ...styles.navLink,
+            ...(viewMode === 'all' ? styles.navLinkActive : {})
+          }}
+          onClick={() => setViewMode('all')}
+        >
+          🌎 &nbsp; All Patients
+        </div>
+
+        <div
+          style={{
+            ...styles.navLink,
+            ...(viewMode === 'mine' ? styles.navLinkActive : {})
+          }}
+          onClick={() => setViewMode('mine')}
+        >
+          👥 &nbsp; My Patients
+        </div>
+        <div style={styles.navLink}>📊 &nbsp; Session History</div>
+       
+ </nav>
+         <div style={{marginTop: 'auto', fontSize: '13px', color: '#94a3b8', textAlign: 'center'}}>
           Dr. {user?.username || 'User'}
         </div>
       </aside>
 
       <main style={styles.mainContent}>
+
         <header style={styles.header}>
           <div>
-            <h2 style={styles.headerTitle}>Management Panel</h2>
-            <p style={styles.headerSubtitle}>Manage your patients and rehabilitation sessions.</p>
-          </div>
+         <h2 style={styles.headerTitle}>
+  {viewMode === 'mine' ? 'My Patients' : 'All Patients'}
+</h2>
+
+<p style={styles.headerSubtitle}>
+  {viewMode === 'mine'
+    ? 'Patients currently assigned to you.'
+    : 'All patients registered in the Kawatek platform.'}
+</p> </div>
           {patients.length > 0 && (
             <button style={styles.primaryButton} onClick={() => setIsModalOpen(true)}>
               + REGISTER PATIENT
@@ -228,9 +308,15 @@ const DoctorDashboard = () => {
         ) : patients.length === 0 ? (
           <div style={styles.centralCard}>
             <div style={styles.iconCircle}>👥</div>
-            <h3 style={{fontSize: '24px', fontWeight: '600', marginBottom: '15px'}}>No registered patients yet</h3>
-            <p style={{color: '#64748b', marginBottom: '40px'}}>To start EMG training, you must first register a patient.</p>
-            <button style={{...styles.primaryButton, margin: '0 auto'}} onClick={() => setIsModalOpen(true)}>
+            <h3 style={{fontSize: '24px', fontWeight: '600', marginBottom: '15px'}}>
+  {viewMode === 'mine' ? 'No patients assigned to you yet' : 'No registered patients yet'}
+</h3>
+
+<p style={{color: '#64748b', marginBottom: '40px'}}>
+  {viewMode === 'mine'
+    ? 'Go to All Patients and assign patients to your list.'
+    : 'To start EMG training, you must first register a patient.'}
+</p>  <button style={{...styles.primaryButton, margin: '0 auto'}} onClick={() => setIsModalOpen(true)}>
               <span>+</span> REGISTER PATIENT
             </button>
           </div>
@@ -240,10 +326,14 @@ const DoctorDashboard = () => {
               const pId = p.id || p._id; 
               return (
                 <div key={pId} style={styles.patientCard}>
-                  <button 
-                    style={styles.deleteButton} 
-                    onClick={() => handleDeletePatient(pId, p.name)}
-                  >✕</button>
+                  {viewMode === 'mine' && (
+  <button 
+    style={styles.deleteButton} 
+    onClick={() => handleRemoveFromMyPatients(pId)}
+  >
+    ✕
+  </button>
+)}
 
                   <h4 style={{margin: '0 0 10px 0', fontSize: '18px'}}>{p.name}</h4>
                   <p style={{fontSize: '13px', color: '#64748b', marginBottom: '20px'}}>{p.condition}</p>
@@ -267,10 +357,50 @@ const DoctorDashboard = () => {
                 START
               </button>
                   </div>
+                  <div style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
+  {viewMode === 'all' && (
+    p.assigned_to_me ? (
+      <button
+        disabled
+        style={{
+          ...styles.viewButton,
+          cursor: 'default',
+          opacity: 0.7
+        }}
+      >
+        ASSIGNED TO ME
+      </button>
+    ) : (
+      <button
+        onClick={() => handleAssignPatient(pId)}
+        style={styles.viewButton}
+      >
+        ASSIGN TO ME
+      </button>
+    )
+  )}
+
+  {viewMode === 'mine' && (
+    <button
+      onClick={() => handleRemoveFromMyPatients(pId)}
+      style={{
+        ...styles.viewButton,
+        color: '#ef4444'
+      }}
+    >
+      REMOVE FROM MY PATIENTS
+    </button>
+  )}
+</div>
                 </div>
+
+                
               );
+              
             })}
+
           </div>
+          
         )}
       </main>
 
