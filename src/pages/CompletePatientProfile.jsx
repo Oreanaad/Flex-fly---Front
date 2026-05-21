@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import '../css/Registro.css';
 import ChickenVisual from './ChickenVisual';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+const API_URL = import.meta.env.VITE_APP_API_URL || 'http://localhost:5000';
 
 const CompletePatientProfile = () => {
   const navigate = useNavigate();
