@@ -9,7 +9,7 @@ export const AuthProvider = ({ children }) => {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [loading, setLoading] = useState(true);
 
-const API_URL = import.meta.env.VITE_APP_API_URL || 'http://localhost:5000';
+const API_BASE_URL = import.meta.env.VITE_APP_API_URL || 'http://localhost:5000';
     useEffect(() => {
         const loadUserFromStorage = () => {
             try {
