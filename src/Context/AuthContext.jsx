@@ -9,8 +9,7 @@ export const AuthProvider = ({ children }) => {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [loading, setLoading] = useState(true);
 
-    const API_BASE_URL = import.meta.env.VITE_APP_API_URL;
-
+const API_URL = import.meta.env.VITE_APP_API_URL || 'http://localhost:5000';
     useEffect(() => {
         const loadUserFromStorage = () => {
             try {
@@ -108,8 +107,7 @@ export const AuthProvider = ({ children }) => {
         }
     }, [API_BASE_URL]);
 
-    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-
+   
 const registerPatient = async (username, email, password, serialNumber) => {
   try {
     const response = await fetch(`${API_URL}/api/patient-users/register`, {
