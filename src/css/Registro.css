@@ -152,3 +152,161 @@
 .link-text:hover {
     color: #0f172a;
 }
+
+/* ========================= */
+/* RESPONSIVE - TABLETS */
+/* ========================= */
+@media (max-width: 1024px) {
+  .registro-title {
+    font-size: clamp(42px, 6vw, 64px);
+  }
+
+  .registro-subtitle {
+    font-size: clamp(14px, 2vw, 20px);
+    max-width: 90%;
+  }
+
+  .registro-card {
+    max-width: 380px;
+  }
+}
+
+/* ========================= */
+/* RESPONSIVE - MOBILE */
+/* ========================= */
+@media (max-width: 768px) {
+  .registro-screen-container {
+    position: relative;
+    min-height: 100vh;
+    flex-direction: column;
+    overflow-y: auto;
+  }
+
+  .registro-identity-section {
+    flex: none;
+    padding: 30px 20px 20px;
+  }
+
+  .chicken-container {
+    margin-bottom: 12px;
+  }
+
+  .chicken-container svg,
+  .chicken-container img {
+    max-width: 120px;
+    height: auto;
+  }
+
+  .registro-title {
+    font-size: clamp(34px, 10vw, 46px);
+    margin-bottom: 12px;
+    max-width: 100%;
+  }
+
+  .registro-subtitle {
+    font-size: 15px;
+    line-height: 1.5;
+    max-width: 95%;
+  }
+
+  .registro-form-section {
+    flex: none;
+    padding: 28px 18px 40px;
+    background-color: #0f172a;
+  }
+
+  .registro-card {
+    max-width: 100%;
+    padding: 26px 22px;
+    border-radius: 20px;
+  }
+
+  .registro-card-title {
+    font-size: 22px;
+    margin-bottom: 24px;
+    text-align: center;
+  }
+
+  .registro-form-flex {
+    gap: 16px;
+  }
+
+  .registro-input {
+    padding: 13px;
+    font-size: 15px;
+  }
+
+  .registro-button {
+    padding: 14px;
+    font-size: 15px;
+  }
+}
+
+/* ========================= */
+/* RESPONSIVE - SMALL PHONES */
+/* ========================= */
+@media (max-width: 480px) {
+  .registro-identity-section {
+    padding: 24px 16px 16px;
+  }
+
+  .registro-title {
+    font-size: clamp(30px, 11vw, 40px);
+  }
+
+  .registro-subtitle {
+    font-size: 14px;
+  }
+
+  .registro-form-section {
+    padding: 22px 14px 32px;
+  }
+
+  .registro-card {
+    padding: 22px 18px;
+    border-radius: 18px;
+  }
+
+  .registro-card-title {
+    font-size: 20px;
+  }
+
+  .input-label {
+    font-size: 11px;
+  }
+
+  .registro-input {
+    padding: 12px;
+    font-size: 14px;
+  }
+
+  .link-text {
+    font-size: 13px;
+  }
+}
+
+/* ========================= */
+/* RESPONSIVE - SHORT SCREENS */
+/* ========================= */
+@media (max-height: 700px) and (max-width: 768px) {
+  .registro-identity-section {
+    padding-top: 18px;
+    padding-bottom: 12px;
+  }
+
+  .chicken-container {
+    display: none;
+  }
+
+  .registro-title {
+    font-size: 32px;
+  }
+
+  .registro-subtitle {
+    font-size: 13px;
+  }
+
+  .registro-form-section {
+    padding-top: 18px;
+  }
+}

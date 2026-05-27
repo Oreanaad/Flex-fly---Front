@@ -1,0 +1,161 @@
+.patient-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.9);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  backdrop-filter: blur(8px);
+  padding: 20px;
+}
+
+.patient-modal-content {
+  background: #1e293b;
+  padding: 40px;
+  border-radius: 28px;
+  width: 100%;
+  max-width: 550px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.patient-modal-title {
+  font-size: 28px;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0 0 8px 0;
+  text-align: center;
+}
+
+.patient-modal-subtitle {
+  font-size: 14px;
+  color: #fbfbfb;
+  margin: 0 0 35px 0;
+  text-align: center;
+}
+
+.patient-modal-error {
+  background: rgba(239, 68, 68, 0.2);
+  color: #fca5a5;
+  padding: 10px;
+  border-radius: 10px;
+  font-size: 13px;
+  margin-bottom: 20px;
+  text-align: center;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.patient-input-group {
+  margin-bottom: 20px;
+}
+
+.patient-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: #ffffff;
+  margin-bottom: 8px;
+  text-align: left;
+  padding-left: 4px;
+}
+
+.patient-input {
+  width: 100%;
+  padding: 14px 18px;
+  border-radius: 14px;
+  border: 2px solid transparent;
+  background: #ffffff;
+  font-size: 15px;
+  color: #1e293b;
+  outline: none;
+  box-sizing: border-box;
+  text-align: left;
+}
+
+.patient-input:focus {
+  border-color: #7c3aed;
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.25);
+}
+
+.patient-select {
+  appearance: none;
+  cursor: pointer;
+}
+
+.patient-textarea {
+  min-height: 90px;
+  resize: vertical;
+}
+
+.patient-submit-button,
+.patient-cancel-button {
+  width: 100%;
+  border: none;
+  border-radius: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.patient-submit-button {
+  background: #6d28d9;
+  color: white;
+  padding: 16px;
+  font-size: 16px;
+  margin-top: 10px;
+  box-shadow: 0 10px 15px -3px rgba(109, 40, 217, 0.3);
+}
+
+.patient-cancel-button {
+  background: white;
+  color: #1e293b;
+  padding: 14px;
+  font-size: 14px;
+  margin-top: 12px;
+}
+
+@media (max-width: 768px) {
+  .patient-modal-content {
+    max-width: 92vw;
+    padding: 30px 24px;
+    border-radius: 22px;
+  }
+
+  .patient-modal-title {
+    font-size: 24px;
+  }
+
+  .patient-modal-subtitle {
+    font-size: 13px;
+    margin-bottom: 28px;
+  }
+}
+
+@media (max-width: 480px) {
+  .patient-modal-overlay {
+    padding: 12px;
+    align-items: flex-start;
+  }
+
+  .patient-modal-content {
+    margin-top: 20px;
+    padding: 24px 18px;
+    border-radius: 18px;
+  }
+
+  .patient-modal-title {
+    font-size: 22px;
+  }
+
+  .patient-input {
+    padding: 13px 14px;
+    font-size: 14px;
+  }
+
+  .patient-submit-button {
+    font-size: 14px;
+    padding: 14px;
+  }
+}
