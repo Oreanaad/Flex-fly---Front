@@ -1,12 +1,11 @@
 
 import React, { useEffect, useState } from 'react';
-
+import { generateSessionPDF } from '../src/SessionPdf';
 const API_URL = import.meta.env.VITE_APP_API_URL;
 
 const PatientHistoryModal = ({ patient, token, onClose }) => {
   const [sessions, setSessions] = useState([]);
-  const [from, setFrom] = useState('');
-  const [to, setTo] = useState('');
+  const [date, setDate] = useState('');
   const [mode, setMode] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -18,10 +17,10 @@ const PatientHistoryModal = ({ patient, token, onClose }) => {
     setLoading(true);
 
     const params = new URLSearchParams();
-    if (from) params.append('from', from);
-    if (to) params.append('to', to);
-    if (mode) params.append('mode', mode);
-
+   if (date) params.append('date', date);
+   console.log("History patient:", patient);
+console.log("History patientId:", patientId);
+console.log("History date:", date);
     try {
       const response = await fetch(
         `${API_URL}/api/patients/${patientId}/sessions?${params.toString()}`,
@@ -41,215 +40,196 @@ const PatientHistoryModal = ({ patient, token, onClose }) => {
       setLoading(false);
     }
   };
+  const downloadSessionPDF = async (sessionId) => {
+  try {
+    const response = await fetch(`${API_URL}/api/sessions/${sessionId}/report-data`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+
+    const data = await response.json();
+
+    if (!data.success) {
+      alert("Could not load session report.");
+      return;
+    }
+
+    const s = data.session;
+
+    generateSessionPDF({
+      patient: {
+        id: s.patient_id,
+        name: s.name,
+        age: s.age,
+        affected_side: s.affected_side,
+        medical_observation: s.condition
+      },
+      metrics: {
+        si: s.selectivity_index,
+        cr: s.coactivation_ratio,
+        fatigue: s.fatigue_trend,
+        ce: s.control_efficiency
+      },
+      score: s.score,
+      sessionHistory: data.samples,
+      gameMode: s.game_mode
+    });
+
+  } catch (error) {
+    console.error("Error downloading PDF:", error);
+    alert("Error downloading PDF.");
+  }
+};
 
   useEffect(() => {
     fetchSessions();
   }, [patientId]);
 
-  return (
-    <div style={styles.overlay}>
-      <div style={styles.modal}>
-        <div style={styles.header}>
-          <div>
-            <h2 style={styles.title}>Session History</h2>
-            <p style={styles.subtitle}>{patient?.name || 'Patient'}</p>
-          </div>
+ return (
+  <div className="history-overlay">
+    <div className="history-modal">
 
-          <button onClick={onClose} style={styles.closeButton}>✕</button>
+      <div className="history-header">
+        <div>
+          <h2 className="history-title">Session History</h2>
+          <p className="history-subtitle">
+            {patient?.name || 'Patient'}
+          </p>
         </div>
 
-        <div style={styles.filters}>
-          <div>
-            <label style={styles.label}>From</label>
-            <input
-              type="date"
-              value={from}
-              onChange={(e) => setFrom(e.target.value)}
-              style={styles.input}
-            />
-          </div>
-
-          <div>
-            <label style={styles.label}>To</label>
-            <input
-              type="date"
-              value={to}
-              onChange={(e) => setTo(e.target.value)}
-              style={styles.input}
-            />
-          </div>
-
-          <div>
-            <label style={styles.label}>Mode</label>
-            <select
-              value={mode}
-              onChange={(e) => setMode(e.target.value)}
-              style={styles.input}
-            >
-              <option value="">All</option>
-              <option value="FLEXION">FLEXION</option>
-              <option value="EXTENSION">EXTENSION</option>
-              <option value="COMBINED">COMBINED</option>
-            </select>
-          </div>
-
-          <button onClick={fetchSessions} style={styles.filterButton}>
-            Filter
-          </button>
-        </div>
-
-        {loading ? (
-          <p style={styles.empty}>Loading sessions...</p>
-        ) : sessions.length === 0 ? (
-          <p style={styles.empty}>No sessions found.</p>
-        ) : (
-          <div style={styles.tableWrapper}>
-            <table style={styles.table}>
-              <thead>
-                <tr>
-                  <th style={styles.th}>Date</th>
-                  <th style={styles.th}>Mode</th>
-                  <th style={styles.th}>Score</th>
-                  <th style={styles.th}>SI</th>
-                  <th style={styles.th}>CR</th>
-                  <th style={styles.th}>Fatigue</th>
-                  <th style={styles.th}>CE</th>
-                  <th style={styles.th}>PDF</th>
-                </tr>
-              </thead>
-
-              <tbody>
-                {sessions.map((s) => (
-                  <tr key={s.id}>
-                    <td style={styles.td}>
-                      {s.created_at
-                        ? new Date(s.created_at).toLocaleString()
-                        : 'N/A'}
-                    </td>
-                    <td style={styles.td}>{s.game_mode}</td>
-                    <td style={styles.td}>{s.score}</td>
-                    <td style={styles.td}>{s.selectivity_index}</td>
-                    <td style={styles.td}>{s.coactivation_ratio}%</td>
-                    <td style={styles.td}>{s.fatigue_trend}%</td>
-                    <td style={styles.td}>{s.control_efficiency}</td>
-                    <td style={styles.td}>
-                      {s.pdf_url ? (
-                        <a href={s.pdf_url} target="_blank" rel="noreferrer">
-                          Download
-                        </a>
-                      ) : (
-                        <span style={{ color: '#94a3b8' }}>No PDF</span>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
+        <button
+          onClick={onClose}
+          className="history-close"
+        >
+          ✕
+        </button>
       </div>
+
+      <div className="history-filters">
+
+        <div className="history-filter-group">
+          <label className="history-label">Date</label>
+
+          <input
+            type="date"
+            value={date}
+            onChange={(e) => setDate(e.target.value)}
+            className="history-input"
+          />
+        </div>
+
+        <button
+          onClick={fetchSessions}
+          className="history-filter-button"
+        >
+          FILTER
+        </button>
+
+        <button
+          onClick={() => {
+            setDate('');
+            setTimeout(fetchSessions, 0);
+          }}
+          className="history-clear-button"
+        >
+          CLEAR
+        </button>
+
+      </div>
+
+      {loading ? (
+
+        <div className="history-empty">
+          Loading sessions...
+        </div>
+
+      ) : sessions.length === 0 ? (
+
+        <div className="history-empty">
+          No sessions found.
+        </div>
+
+      ) : (
+
+        <div className="history-table-wrapper">
+
+          <table className="history-table">
+
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Mode</th>
+                <th>Score</th>
+                <th>SI</th>
+                <th>CR</th>
+                <th>Fatigue</th>
+                <th>CE</th>
+                <th>PDF</th>
+              </tr>
+            </thead>
+
+            <tbody>
+
+              {sessions.map((s) => (
+
+                <tr key={s.id}>
+
+                  <td>
+                    {s.created_at
+                      ? new Date(s.created_at).toLocaleString()
+                      : 'N/A'}
+                  </td>
+
+                  <td>
+                    {s.game_mode}
+                  </td>
+
+                  <td>
+                    {s.score}
+                  </td>
+
+                  <td>
+                    {Number(s.selectivity_index || 0).toFixed(2)}
+                  </td>
+
+                  <td>
+                    {Number(s.coactivation_ratio || 0).toFixed(2)}%
+                  </td>
+
+                  <td>
+                    {Number(s.fatigue_trend || 0).toFixed(2)}%
+                  </td>
+
+                  <td>
+                    {Number(s.control_efficiency || 0).toFixed(2)}
+                  </td>
+
+                  <td>
+                    <button
+                      onClick={() => downloadSessionPDF(s.id)}
+                      className="history-pdf-button"
+                    >
+                      DOWNLOAD
+                    </button>
+                  </td>
+
+                </tr>
+
+              ))}
+
+            </tbody>
+
+          </table>
+
+        </div>
+
+      )}
+
     </div>
-  );
+  </div>
+);
 };
 
-const styles = {
-  overlay: {
-    position: 'fixed',
-    inset: 0,
-    backgroundColor: 'rgba(15, 23, 42, 0.65)',
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    zIndex: 9999
-  },
-  modal: {
-    backgroundColor: '#ffffff',
-    width: '90%',
-    maxWidth: '1050px',
-    maxHeight: '85vh',
-    overflowY: 'auto',
-    borderRadius: '18px',
-    padding: '28px',
-    boxShadow: '0 20px 50px rgba(0,0,0,0.25)'
-  },
-  header: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: '24px'
-  },
-  title: {
-    margin: 0,
-    fontSize: '24px',
-    color: '#0f172a'
-  },
-  subtitle: {
-    margin: '6px 0 0 0',
-    color: '#64748b'
-  },
-  closeButton: {
-    border: 'none',
-    background: '#f1f5f9',
-    borderRadius: '10px',
-    padding: '10px 14px',
-    cursor: 'pointer',
-    fontWeight: 'bold'
-  },
-  filters: {
-    display: 'flex',
-    gap: '14px',
-    alignItems: 'end',
-    marginBottom: '24px',
-    flexWrap: 'wrap'
-  },
-  label: {
-    display: 'block',
-    fontSize: '12px',
-    color: '#64748b',
-    marginBottom: '6px',
-    fontWeight: 600
-  },
-  input: {
-    padding: '10px 12px',
-    border: '1px solid #cbd5e1',
-    borderRadius: '10px',
-    minWidth: '150px'
-  },
-  filterButton: {
-    backgroundColor: '#6d28d9',
-    color: 'white',
-    border: 'none',
-    padding: '11px 20px',
-    borderRadius: '10px',
-    fontWeight: 700,
-    cursor: 'pointer'
-  },
-  empty: {
-    textAlign: 'center',
-    color: '#64748b',
-    padding: '40px 0'
-  },
-  tableWrapper: {
-    overflowX: 'auto'
-  },
-  table: {
-    width: '100%',
-    borderCollapse: 'collapse'
-  },
-  th: {
-    backgroundColor: '#f8fafc',
-    color: '#475569',
-    textAlign: 'left',
-    padding: '12px',
-    borderBottom: '1px solid #e2e8f0',
-    fontSize: '13px'
-  },
-  td: {
-    padding: '12px',
-    borderBottom: '1px solid #e2e8f0',
-    fontSize: '13px',
-    color: '#334155'
-  }
-};
 
 export default PatientHistoryModal;
