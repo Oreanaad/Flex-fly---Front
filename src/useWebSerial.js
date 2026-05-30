@@ -1,5 +1,7 @@
 import { useState, useRef } from 'react';
 
+const ADC_MAX = 1023.0; // si tu Arduino manda hasta 4095, cambiar por 4095.0
+
 export const useWebSerial = () => {
   const [rawValues, setRawValues] = useState({ a: 0, b: 0 });
   const [isConnected, setIsConnected] = useState(false);
@@ -16,10 +18,11 @@ export const useWebSerial = () => {
       readerRef.current = decoder.readable.getReader();
 
       let buffer = "";
+
       while (true) {
         const { value, done } = await readerRef.current.read();
         if (done) break;
-        
+
         buffer += value;
 
         if (buffer.length > 150) buffer = buffer.slice(-70);
@@ -30,29 +33,44 @@ export const useWebSerial = () => {
           buffer = lines[lines.length - 1];
 
           if (lastLine) {
-            const parts = lastLine.trim().split(',');
-            if (parts.length >= 2) {
-              const valA = (parseFloat(parts[0]) || 0) / 1023.0;
-              const valB = (parseFloat(parts[1]) || 0) / 1023.0;
+            const cleanLine = lastLine.trim();
 
-              setRawValues(prev => {
-                // Si la señal nueva es menor a la anterior, bajamos a 0 inmediatamente
-                // Si es mayor, aplicamos un poco de suavizado (0.5/0.5)
-                const finalA = valA > prev.a ? (prev.a * 0.5 + valA * 0.5) : valA;
-                const finalB = valB > prev.b ? (prev.b * 0.5 + valB * 0.5) : valB;
+            console.log("SERIAL RAW:", cleanLine);
 
-                return {
-                  a: finalA < 0.02 ? 0 : finalA,
-                  b: finalB < 0.02 ? 0 : finalB
-                };
-              });
+            const match = cleanLine.match(/^(\d+)[,.](\d+)$/);
+            if (!match) {
+              console.warn("Formato serial inválido:", cleanLine);
+              continue;
             }
+
+            const rawA = Number(match[1]);
+            const rawB = Number(match[2]);
+
+            const valA = Math.min(1, Math.max(0, rawA / ADC_MAX));
+            const valB = Math.min(1, Math.max(0, rawB / ADC_MAX));
+
+            console.log("SERIAL PARSED:", {
+              rawA,
+              rawB,
+              valA,
+              valB
+            });
+
+            setRawValues(prev => {
+              const finalA = valA > prev.a ? (prev.a * 0.5 + valA * 0.5) : valA;
+              const finalB = valB > prev.b ? (prev.b * 0.5 + valB * 0.5) : valB;
+
+              return {
+                a: finalA < 0.02 ? 0 : finalA,
+                b: finalB < 0.02 ? 0 : finalB
+              };
+            });
           }
         }
       }
-    } catch (e) { 
-      console.error(e); 
-      setIsConnected(false); 
+    } catch (e) {
+      console.error(e);
+      setIsConnected(false);
     }
   };
 
