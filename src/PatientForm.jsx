@@ -8,7 +8,20 @@ const PatientForm = ({ onSave, onCancel }) => {
     affected_side: 'Derecho',
     condition: ''
   });
+const handleAgeChange = (e) => {
+  const value = e.target.value.replace(/\D/g, '');
 
+  if (value === '') {
+    setFormData({ ...formData, age: '' });
+    return;
+  }
+
+  const numberValue = Number(value);
+
+  if (numberValue >= 1 && numberValue <= 100) {
+    setFormData({ ...formData, age: value });
+  }
+};
   const handleSubmit = (e) => {
     e.preventDefault();
     onSave(formData);
@@ -48,11 +61,14 @@ const PatientForm = ({ onSave, onCancel }) => {
           <div style={{ flex: 1 }}>
             <label style={{ display: 'block', fontSize: '14px', fontWeight: 'bold' }}>Edad</label>
             <input 
-              type="number" 
-              required 
-              style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #e2e8f0' }}
-              onChange={(e) => setFormData({...formData, age: e.target.value})}
-            />
+  type="text"
+  inputMode="numeric"
+  pattern="[0-9]*"
+  required
+  value={formData.age}
+  style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #e2e8f0' }}
+  onChange={handleAgeChange}
+/>
           </div>
         </div>
 

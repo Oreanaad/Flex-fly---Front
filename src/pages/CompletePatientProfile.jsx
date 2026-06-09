@@ -22,7 +22,20 @@ const CompletePatientProfile = () => {
   const [loading, setLoading] = useState(false);
 
   const patientUserId = patientFromState?.patient_user_id || patientFromState?.id;
+      const handleAgeChange = (e) => {
+  const value = e.target.value.replace(/\D/g, '');
 
+  if (value === '') {
+    setAge('');
+    return;
+  }
+
+  const numberValue = Number(value);
+
+  if (numberValue >= 1 && numberValue <= 100) {
+    setAge(value);
+  }
+};
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -158,14 +171,16 @@ const CompletePatientProfile = () => {
               <div className="input-group">
                 <label className="input-label">Age</label>
                 <input
-                  type="number"
-                  placeholder="Age"
-                  className="registro-input"
-                  value={age}
-                  onChange={(e) => setAge(e.target.value)}
-                  required
-                  disabled={loading}
-                />
+  type="text"
+  inputMode="numeric"
+  pattern="[0-9]*"
+  placeholder="Age"
+  className="registro-input no-spinner"
+  value={age}
+  onChange={handleAgeChange}
+  required
+  disabled={loading}
+/>
               </div>
 
               <div className="input-group">

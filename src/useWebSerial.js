@@ -10,7 +10,7 @@ export const useWebSerial = () => {
   const connectSerial = async () => {
     try {
       const port = await navigator.serial.requestPort();
-      await port.open({ baudRate: 115200 });
+      await port.open({ baudRate: 9600 });
       setIsConnected(true);
 
       const decoder = new TextDecoderStream();

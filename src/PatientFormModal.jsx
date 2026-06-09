@@ -10,7 +10,20 @@ const PatientFormModal = ({ onSave, onCancel }) => {
   });
 
   const [error, setError] = useState('');
+const handleAgeChange = (e) => {
+  const value = e.target.value.replace(/\D/g, '');
 
+  if (value === '') {
+    setFormData({ ...formData, age: '' });
+    return;
+  }
+
+  const numberValue = Number(value);
+
+  if (numberValue >= 1 && numberValue <= 100) {
+    setFormData({ ...formData, age: value });
+  }
+};
   const handleSubmit = (e) => {
     e.preventDefault();
 
@@ -19,7 +32,7 @@ const PatientFormModal = ({ onSave, onCancel }) => {
       return;
     }
 
-    if (!formData.age || formData.age <= 0 || formData.age > 110) {
+    if (!formData.age || formData.age <= 1 || formData.age > 100) {
       setError('Please enter a valid age.');
       return;
     }
@@ -64,13 +77,16 @@ const PatientFormModal = ({ onSave, onCancel }) => {
 
           <div className="patient-input-group">
             <label className="patient-label">Age</label>
-            <input
-              className="patient-input"
-              type="number"
-              placeholder="00"
-              value={formData.age}
-              onChange={(e) => setFormData({ ...formData, age: e.target.value })}
-            />
+           <input 
+  type="text"
+  inputMode="numeric"
+  pattern="[0-9]*"
+  required
+  className="patient-input"
+  placeholder="e.g. 35"
+  value={formData.age}
+  onChange={handleAgeChange}
+/>
           </div>
 
           <div className="patient-input-group">
